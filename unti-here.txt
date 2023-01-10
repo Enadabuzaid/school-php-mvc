@@ -1,0 +1,3 @@
+you cand use this template mvc project structure until this branch and comment 
+
+
