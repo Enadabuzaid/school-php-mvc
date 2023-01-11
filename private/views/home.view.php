@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+<?php  $this->view('includes/head') ?>
 
-    <link rel="stylesheet" href="<?= ROOT ?>/assets/bootstrap/bootstrap.min.css">
-</head>
-<body>
-    <div class="container-fluid">
-        <h1>this is home page</h1>
-    </div>
-</body>
-</html>
+<!-- CONTAINER START  -->
+<div class="container-fluid">
+    <h1>this is home page</h1>
+</div>
+<!-- CONTAINER END  -->
+
+<?php $this->view('includes/footer') ?>
+
