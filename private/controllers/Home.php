@@ -8,7 +8,9 @@ class Home extends Controller
   
   public function index()
   {
-   echo $this->view('home');
+    $user = $this->load_model('User');
+    
+    $this->view('home' , ['rows' => ""]);
   }
 }
 
