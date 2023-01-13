@@ -1,4 +1,6 @@
 <?php  $this->view('includes/head') ?>
+<?php $this->view('includes/nav')?>
+
 
 <!-- CONTAINER START  -->
 <div class="container-fluid">
