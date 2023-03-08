@@ -1,5 +1,4 @@
 <?php
-
 /**
  * User Model
  */
@@ -105,6 +104,4 @@ class User extends Model
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         return $data;
     }
-
-   
 }

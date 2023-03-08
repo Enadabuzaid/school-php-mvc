@@ -44,7 +44,7 @@
     <ul class="navbar-nav ms-auto">
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          user
+          <?= Auth::user() ?>
         </a>
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" href="<?=ROOT?>/profile">Profile</a>
