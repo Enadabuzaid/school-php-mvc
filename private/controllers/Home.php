@@ -1,36 +1,23 @@
 <?php
 
 /**
- * Home
+ * home controller
  */
-class Home extends Controller 
+class Home extends Controller
 {
-  
-  public function index()
-  {
-    // $user = $this->load_model('User');
+	
+	function index()
+	{
+		// code...
+		if(!Auth::logged_in())
+		{
+			$this->redirect('login');
+		}
 
-    $user = new User();
-    $arr= array();
-    // $arr = [
-    //   'firstname' => 'enadtest2',
-    //   'lastname' => 'abuzaidtest2',
-    //   'date' => date('d-m-y h:i:s')
-    // ];
+		$user = new User();
+ 
+		$data = $user->findAll();
 
-     $arr = [
-      'firstname' => 'updated',
-      // 'lastname' => 'abuzaidtest2',
-      // 'date' => date('d-m-y h:i:s')
-    ];
-    // $arr['lastname'] = 'updated name2';
-
-
-    $user->delete(1);
-    $data = $user->findAll();
-
-
-    $this->view('home' , ['rows' => $data]);
-  }
+		$this->view('home',['rows'=>$data]);
+	}
 }
-
