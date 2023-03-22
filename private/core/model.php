@@ -35,20 +35,26 @@ class Model extends Database
 
 	public function insert($data)
 	{
+		
 
-		var_dump($data);die;
 		//remove unwanted columns
-		if (property_exists($this, 'allowedColumns')) {
-			foreach ($data as $key => $column) {
-				if (!in_array($key, $this->allowedColumns)) {
+		if(property_exists($this, 'allowedColumns'))
+		{
+			foreach($data as $key => $column)
+			{
+				if(!in_array($key, $this->allowedColumns))
+				{
 					unset($data[$key]);
 				}
 			}
+
 		}
 
 		//run functions before insert
-		if (property_exists($this, 'beforeInsert')) {
-			foreach ($this->beforeInsert as $func) {
+		if(property_exists($this, 'beforeInsert'))
+		{
+			foreach($this->beforeInsert as $func)
+			{
 				$data = $this->$func($data);
 			}
 		}
@@ -59,7 +65,15 @@ class Model extends Database
 
 		$query = "insert into $this->table ($columns) values (:$values)";
 
-		return $this->query($query, $data);
+		if($this->query($query,$data))
+		{
+			echo "yes  true ";
+		} else 
+		{
+			echo "false ";
+		}
+
+		return $this->query($query,$data);
 	}
 
 	public function update($id, $data)
