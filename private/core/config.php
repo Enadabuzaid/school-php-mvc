@@ -1,16 +1,10 @@
 <?php
 
-define('URL' , 'http://localhost/php/student-project' );
+define('ROOT', 'http://localhost:8080/public');
+define('ASSETS', 'http://localhost:8080/public/assets');
 
-define('ROOT' , URL.'/public');
-
-define('ASSETS_PATH' ,URL.'/public/assets');
-
-define('IMAGES_PATH' , URL.'/public/assets/images' );
-
-
-define('DBNAME', 'school_php');
-define('DBHOST', 'localhost');
-define('DBUSER', 'root');
-define('DBPASS', 'root');
+define('DBNAME', 'school_db');
+define('DBHOST', 'db');
+define('DBUSER', 'school_user');
+define('DBPASS', 'school@root');
 define('DBDRIVER', 'mysql');

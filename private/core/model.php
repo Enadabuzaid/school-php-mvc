@@ -5,59 +5,132 @@
  */
 class Model extends Database
 {
-	// protected $table = "users";
-	protected $table;
 	public $errors = array();
 
 	public function __construct()
 	{
-		if(property_exists($this, 'table'))
+		// code...
+		if(!property_exists($this, 'table'))
 		{
-			$this->table = strtolower(get_class($this))."s";
+			$this->table = strtolower($this::class) . "s";
 		}
 	}
 
 
-	public function where($column,$value)
+	protected function get_primary_key($table)
+	{
+
+		$query = "SHOW KEYS from $table WHERE Key_name = 'PRIMARY' ";
+		$db = new Database();
+		$data = $db->query($query);
+
+		if(!empty($data[0]))
+		{
+			return $data[0]->Column_name;
+		}
+		return 'id';
+	}
+
+	public function where($column,$value,$orderby = 'desc',$limit = 10,$offset = 0)
 	{
 
 		$column = addslashes($column);
-		$query = "select * from $this->table where $column = :value";
-		return $this->query($query,[
+		$primary_key = $this->get_primary_key($this->table);
+
+		$query = "select * from $this->table where $column = :value order by $primary_key $orderby limit $limit offset $offset";
+		$data = $this->query($query,[
 			'value'=>$value
 		]);
+
+		//run functions after select
+		if(is_array($data)){
+			if(property_exists($this, 'afterSelect'))
+			{
+				foreach($this->afterSelect as $func)
+				{
+					$data = $this->$func($data);
+				}
+			}
+		}
+
+		return $data;
 	}
 
-	public function findAll()
+	public function first($column,$value,$orderby = 'desc')
 	{
-		$query = "select * from $this->table ";
-		return $this->query($query);
+
+		$column = addslashes($column);
+		$primary_key = $this->get_primary_key($this->table);
+
+		$query = "select * from $this->table where $column = :value order by $primary_key $orderby";
+		$data = $this->query($query,[
+			'value'=>$value
+		]);
+
+		//run functions after select
+		if(is_array($data)){
+			if(property_exists($this, 'afterSelect'))
+			{
+				foreach($this->afterSelect as $func)
+				{
+					$data = $this->$func($data);
+				}
+			}
+		}
+
+		if(is_array($data)){
+			$data = $data[0];
+		}
+		return $data;
+	}
+
+	public function findAll($orderby = 'desc',$limit = 100,$offset = 0)
+	{
+
+		$primary_key = $this->get_primary_key($this->table);
+
+		$query = "select * from $this->table order by $primary_key $orderby limit $limit offset $offset";
+		$data = $this->query($query);
+
+		//run functions after select
+		if(is_array($data)){
+			if(property_exists($this, 'afterSelect'))
+			{
+				foreach($this->afterSelect as $func)
+				{
+					$data = $this->$func($data);
+				}
+			}
+		}
+
+		return $data;
+
 	}
 
 	public function insert($data)
 	{
 
 		//remove unwanted columns
-		// if(property_exists($this, 'allowedColumns'))
-		// {
-		// 	foreach($data as $key => $column)
-		// 	{
-		// 		if(!in_array($key, $this->allowedColumns))
-		// 		{
-		// 			unset($data[$key]);
-		// 		}
-		// 	}
+		if(property_exists($this, 'allowedColumns'))
+		{
+			foreach($data as $key => $column)
+			{
+				if(!in_array($key, $this->allowedColumns))
+				{
+					unset($data[$key]);
+				}
+			}
 
-		// }
+		}
 
 		//run functions before insert
-		// if(property_exists($this, 'beforeInsert'))
-		// {
-		// 	foreach($this->beforeInsert as $func)
-		// 	{
-		// 		$data = $this->$func($data);
-		// 	}
-		// }
+		if(property_exists($this, 'beforeInsert'))
+		{
+			foreach($this->beforeInsert as $func)
+			{
+				$data = $this->$func($data);
+			}
+		}
 
 		$keys = array_keys($data);
 		$columns = implode(',', $keys);
@@ -70,6 +143,28 @@ class Model extends Database
 
 	public function update($id,$data)
 	{
+
+		//remove unwanted columns
+		if(property_exists($this, 'allowedColumns'))
+		{
+			foreach($data as $key => $column)
+			{
+				if(!in_array($key, $this->allowedColumns))
+				{
+					unset($data[$key]);
+				}
+			}
+
+		}
+
+		//run functions before insert
+		if(property_exists($this, 'beforeUpdate'))
+		{
+			foreach($this->beforeUpdate as $func)
+			{
+				$data = $this->$func($data);
+			}
+		}
 
 		$str = "";
 		foreach ($data as $key => $value) {
@@ -92,21 +187,6 @@ class Model extends Database
 		$data['id'] = $id;
 		return $this->query($query,$data);
 	}
-
-    // public function get($columns = ['*'])
-    // {
-    //     $query = "select $columns from $this->table ";
-	// 	return $this->query($query);
-    // }
-
-    // public function getWhere($columns = ['*'],$where ="")
-    // {
-    //     if(empty($where)){
-    //         $where =1;
-    //     }
-    //     $query = "select $columns from $this->table WHERE $where ";
-	// 	return $this->query($query);
-    // }
-
 	
 }
+
