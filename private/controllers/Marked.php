@@ -19,13 +19,14 @@ class Marked extends Controller
 
 		if(Auth::access('admin')){
 
-			$query = "select * from tests where school_id = :school_id order by id desc";
+			$query = "select * from tests where school_id = :school_id && year(date) = :school_year order by id desc";
 			$arr['school_id'] = $school_id;
+			$arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
 
 			if(isset($_GET['find']))
 	 		{
 	 			$find = '%' . $_GET['find'] . '%';
-	 			$query = "select * from tests where school_id = :school_id && (test like :find) order by id desc";
+	 			$query = "select * from tests where school_id = :school_id && (test like :find) && year(date) = :school_year order by id desc";
 	 			$arr['find'] = $find;
 	 		}
 
@@ -35,13 +36,14 @@ class Marked extends Controller
 
  			$mytable = "class_lecturers";
   		 
-			$query = "select * from $mytable where user_id = :user_id && disabled = 0";
+			$query = "select * from $mytable where user_id = :user_id && disabled = 0 && year(date) = :school_year";
  			$arr['user_id'] = Auth::getUser_id();
+ 			$arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
 
 			if(isset($_GET['find']))
 	 		{
 	 			$find = '%' . $_GET['find'] . '%';
-	 			$query = "select tests.test, {$mytable}.* from $mytable join tests on tests.test_id = {$mytable}.test_id where {$mytable}.user_id = :user_id && {$mytable}.disabled = 0 && tests.test like :find ";
+	 			$query = "select tests.test, {$mytable}.* from $mytable join tests on tests.test_id = {$mytable}.test_id where {$mytable}.user_id = :user_id && {$mytable}.disabled = 0 && tests.test like :find && year(tests.date) = :school_year";
 	 			$arr['find'] = $find;
 	 		}
 

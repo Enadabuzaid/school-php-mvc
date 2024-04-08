@@ -36,8 +36,11 @@ class Profile extends Controller
  				$mytable = "class_lecturers";
  			}
  			
-			$query = "select * from $mytable where user_id = :user_id && disabled = 0";
-			$data['stud_classes'] = $class->query($query,['user_id'=>$id]);
+			$query = "select * from $mytable where user_id = :user_id && disabled = 0 && year(date) = :school_year";
+			$arr['user_id'] = $id;
+			$arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
+			
+			$data['stud_classes'] = $class->query($query,$arr);
 
 			$data['student_classes'] = array();
 			if($data['stud_classes']){
@@ -62,31 +65,21 @@ class Profile extends Controller
 	 				$disabled = "";
 	 			}
 	 			
-				$query = "select * from $mytable where user_id = :user_id && disabled = 0";
-				$data['stud_classes'] = $class->query($query,['user_id'=>$id]);
+   				$tests = new Tests_model();
 
-				$data['student_classes'] = array();
-				if($data['stud_classes']){
-					foreach ($data['stud_classes'] as $key => $arow) {
-						// code...
-						$data['student_classes'][] = $class->first('class_id',$arow->class_id);
-					}
-				}
+	 			$query = "select * from tests where $disabled class_id in (select class_id from $mytable where user_id = :user_id && disabled = 0) && year(date) = :school_year order by id desc";
+	 			$arr['user_id'] = Auth::getUser_id();
+	 			$arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
 
-				//collect class id's
-				$class_ids = [];
-				foreach ($data['student_classes'] as $key => $class_row) {
-					// code...
-					$class_ids[] = $class_row->class_id;
-				}
-				
-				$id_str = "'" . implode("','", $class_ids) . "'";
-				$query = "select * from tests where $disabled class_id in ($id_str)";
+	 			if(isset($_GET['find']))
+		 		{
+		 			$find = '%' . $_GET['find'] . '%';
+		 			$query = "select * from tests where $disabled class_id in (select class_id from $mytable where user_id = :user_id && disabled = 0) && test like :find && year(date) = :school_year order by id desc";
+		 			$arr['find'] = $find;
+		 		}
 
-				$tests_model = new Tests_model();
-				$tests = $tests_model->query($query);
+	 			$data['test_rows'] = $tests->query($query,$arr);
 
-				$data['test_rows'] = $tests;
 
 			}else{
 
@@ -114,6 +107,7 @@ class Profile extends Controller
 
 		$data['row'] = $row;
 		$data['crumbs'] = $crumbs;
+		$data['unsubmitted']= get_unsubmitted_test_rows();
 
 		if(Auth::access('reception') || Auth::i_own_content($row)){
 			$this->view('profile',$data);

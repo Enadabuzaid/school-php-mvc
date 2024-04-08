@@ -1,11 +1,17 @@
 <?php 
 
-function get_var($key,$default = "")
+function get_var($key,$default = "",$method = "post")
 {
 
-	if(isset($_POST[$key]))
+	$data = $_POST;
+	if($method == "get")
 	{
-		return $_POST[$key];
+		$data = $_GET;
+	}
+
+	if(isset($data[$key]))
+	{
+		return $data[$key];
 	}
 
 	return $default;
@@ -313,5 +319,104 @@ function get_score_percentage($test_id,$user_id)
     }
 
     return 0;
+}
+
+function get_unsubmitted_tests()
+{
+	if(Auth::getRank() == "student")
+	{
+
+		$tests_class = new Tests_model();
+		$query = "select id from tests where class_id in (select class_id from class_students where user_id = :user_id) and test_id not in (select test_id from answered_tests where user_id = :user_id && submitted = 1) && disabled = 0";
+
+		$data = $tests_class->query($query,['user_id'=>Auth::getUser_id()]);
+
+		if($data){
+			return count($data);
+		}
+	}
+
+	return 0;
+}
+
+function get_unsubmitted_test_rows()
+{
+	if(Auth::getRank() == "student")
+	{
+		$tests_class = new Tests_model();
+		$query = "select test_id from tests where class_id in (select class_id from class_students where user_id = :user_id) and test_id not in (select test_id from answered_tests where user_id = :user_id && submitted = 1)";
+
+		$data = $tests_class->query($query,['user_id'=>Auth::getUser_id()]);
+
+		if($data){
+			return array_column($data,'test_id');
+		}
+	}
+
+	return [];
+}
+
+
+function get_years()
+{
+	$arr = array();
+
+	$db = new Database();
+	$query = "select date from classes order by id asc limit 1";
+
+	$row = $db->query($query);
+	if($row){
+
+		$year = date("Y",strtotime($row[0]->date));
+		$arr[] = $year;
+
+		$cur_year = date("Y",time());
+
+		while ($year < $cur_year) {
+			// code...
+			$year += 1;
+			$arr[] = $year;
+		}
+
+	}else{
+		$arr[] = date("Y",time());
+	}
+
+	rsort($arr);
+	return $arr;
+
+}
+
+switch_year();
+function switch_year()
+{
+	if(!isset($_SESSION['SCHOOL_YEAR']))
+	{
+		$_SESSION['SCHOOL_YEAR'] = (object)[];
+		$_SESSION['SCHOOL_YEAR']->year = date("Y",time());
+	}
+
+	if(!empty($_GET['school_year']))
+	{
+		$year = (int)$_GET['school_year'];
+
+		$_SESSION['SCHOOL_YEAR']->year = $year;
+	}
+}
+
+function add_get_vars()
+{
+	$text = '';
+	if(!empty($_GET))
+	{
+		foreach ($_GET as $key => $value) {
+			// code...
+			if($key != "url"){
+				$text .= "<input type='hidden' name='$key' value='$value' />";
+			}
+		}
+	}
+
+	return $text;
 }
 

@@ -40,6 +40,9 @@
 					<td><b>Class:</b> <?=$row->class->class?></td>
 					<td colspan="5"><b>Test Description:</b><br><?=esc($row->description)?></td></tr>
 			</table>
+			<a href="<?=ROOT?>/make_pdf/<?=$row->test_id?>/<?=$student_row->user_id?>?type=test">
+			<button class="btn btn-primary float-end">Save as PDF</button>
+			</a>
  		</div>
  		 
 		

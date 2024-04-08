@@ -51,8 +51,16 @@
         <a class="nav-link <?=($this->controller_name() == 'Classes') ? ' active-nav ':''?> " href="<?=ROOT?>/classes">CLASSES</a>
       </li>
       
-      <li class="nav-item">
-        <a class="nav-link <?=($this->controller_name() == 'Tests') ? ' active-nav ':''?> " href="<?=ROOT?>/tests">TESTS</a>
+      <li class="nav-item" style="position: relative;">
+        <a class="nav-link <?=($this->controller_name() == 'Tests') ? ' active-nav ':''?> " href="<?=ROOT?>/tests">TESTS
+
+          <?php  
+              $unsubmitted_count = get_unsubmitted_tests();
+            ?>
+            <?php if($unsubmitted_count):?>
+              <span class="badge bg-danger text-white" style="position: absolute;top:0px;right:0px"><?=$unsubmitted_count?></span>
+            <?php endif;?>
+        </a>
       </li>
 
       <?php if(Auth::access('lecturer')):?>
@@ -88,6 +96,24 @@
 
     </ul>
 
+      <form class="form-inline">
+        <div class="input-group">
+
+          <?php $years = get_years()?>
+          <select name="school_year" class="form-select" style="max-width:100px">
+            <option><?=get_var('school_year',!empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time()),"get")?></option>
+            <?php foreach ($years as $year): ?>
+              <option><?=$year?></option>
+            <?php endforeach ?>
+           </select>
+
+           <?=add_get_vars()?>
+           
+          <div class="input-group-prepend">
+            <button class="input-group-text" id="basic-addon1">&nbsp<i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </form>
 
   </div>
 

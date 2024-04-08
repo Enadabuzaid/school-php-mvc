@@ -74,8 +74,10 @@ class Tests_model extends Model
         $user = new User();
         foreach ($data as $key => $row) {
             // code...
-            $result = $user->where('user_id',$row->user_id);
-            $data[$key]->user = is_array($result) ? $result[0] : false;
+            if(!empty($row->user_id)){
+                $result = $user->where('user_id',$row->user_id);
+                $data[$key]->user = is_array($result) ? $result[0] : false;
+            }
         }
        
         return $data;
@@ -121,21 +123,27 @@ class Tests_model extends Model
         $test = new Tests_model();
         if(Auth::access('admin')){
 
-            $query = "select * from answered_tests where test_id in (select test_id from tests where school_id = :school_id) && submitted = 1 && marked = 0";
-            $arr['school_id'] = $school_id;
- 
+            $query = "select * from answered_tests where test_id in (select test_id from tests where school_id = :school_id) && submitted = 1 && marked = 0 && year(date) = :school_year";
+            $arr['school_id'] = Auth::getSchool_id();
+            $arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
+
             $to_mark = $test->query($query,$arr);
         }else{
 
             $mytable = "class_lecturers";
             $arr['user_id'] = Auth::getUser_id();
-         
-            $query = "select * from answered_tests where test_id in (select test_id from tests where class_id in (SELECT class_id FROM `class_lecturers` WHERE user_id = :user_id)) && submitted = 1 && marked = 0";
+            $arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
+
+            $query = "select * from answered_tests where test_id in (select test_id from tests where class_id in (SELECT class_id FROM `class_lecturers` WHERE user_id = :user_id)) && submitted = 1 && marked = 0 && year(date) = :school_year";
             $to_mark = $test->query($query,$arr);
       
         }
  
-        return count($to_mark);
+        if($to_mark){
+            return count($to_mark);
+        }
+
+        return 0;
     }
 
  

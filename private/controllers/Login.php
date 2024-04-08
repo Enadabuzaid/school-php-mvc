@@ -23,7 +23,7 @@ class Login extends Controller
  					$school = new School();
  					$school_row = $school->first('school_id',$row->school_id);
  					$row->school_name = $school_row->school;
-
+ 					
  					Auth::authenticate($row);
  					$this->redirect('/home');	
  				}

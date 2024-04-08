@@ -111,6 +111,11 @@ class Auth
 	public static function i_own_content($row)
 	{
 
+		if(is_array($row))
+		{
+			$row = $row[0];
+		}
+		
 		if(!isset($_SESSION['USER']))
 		{
 			return false;

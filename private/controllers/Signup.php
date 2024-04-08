@@ -8,8 +8,7 @@ class Signup extends Controller
 	
 	function index()
 	{
-
-        // code...
+		// code...
 		if(!Auth::logged_in())
 		{
 			$this->redirect('login');

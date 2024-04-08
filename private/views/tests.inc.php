@@ -7,10 +7,10 @@
 			<th></th>
 		</tr>
 		<?php if(isset($test_rows) && $test_rows):?>
-			 
+		
 			<?php foreach ($test_rows as $test_row):?>
 			 
-			 <tr>
+			 <tr style="<?=(in_array($test_row->test_id, $unsubmitted)) ? 'background-color:#eebebe':''?>" >
 			 	<td>
 			 		<?php if(Auth::access('lecturer')):?>
 			 		<a href="<?=ROOT?>/single_test/<?=$test_row->test_id?>">

@@ -8,3 +8,4 @@ define('DBHOST', 'db');
 define('DBUSER', 'school_user');
 define('DBPASS', 'school@root');
 define('DBDRIVER', 'mysql');
+

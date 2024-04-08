@@ -20,13 +20,14 @@ class To_mark extends Controller
 
 		if(Auth::access('admin')){
 
-			$query = "select * from answered_tests where test_id in (select test_id from tests where school_id = :school_id) && submitted = 1 && marked = 0 order by id desc";
+			$query = "select * from answered_tests where test_id in (select test_id from tests where school_id = :school_id) && submitted = 1 && marked = 0 && year(date) = :school_year order by id desc";
 			$arr['school_id'] = $school_id;
+			$arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
 
 			if(isset($_GET['find']))
 	 		{
 	 			$find = '%' . $_GET['find'] . '%';
-	 			$query = "select * from tests where school_id = :school_id && (test like :find) order by id desc";
+	 			$query = "select * from tests where school_id = :school_id && (test like :find) && year(date) = :school_year order by id desc";
 	 			$arr['find'] = $find;
 	 		}
 
@@ -35,8 +36,9 @@ class To_mark extends Controller
 
  			$mytable = "class_lecturers";
   			$arr['user_id'] = Auth::getUser_id();
- 		 
- 		 	$query = "select * from answered_tests where test_id in (select test_id from tests where class_id in (SELECT class_id FROM `class_lecturers` WHERE user_id = :user_id)) && submitted = 1 && marked = 0 order by id desc";
+ 		 	$arr['school_year'] = !empty($_SESSION['SCHOOL_YEAR']->year) ? $_SESSION['SCHOOL_YEAR']->year : date("Y",time());
+
+ 		 	$query = "select * from answered_tests where test_id in (select test_id from tests where class_id in (SELECT class_id FROM `class_lecturers` WHERE user_id = :user_id)) && submitted = 1 && marked = 0 && year(date) = :school_year order by id desc";
   		 	$to_mark = $test->query($query,$arr);
   		 	
 			/*
